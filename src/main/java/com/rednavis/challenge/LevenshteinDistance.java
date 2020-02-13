@@ -5,6 +5,8 @@ package com.rednavis.challenge;
 // https://web.stanford.edu/class/cs124/lec/med.pdf
 //
 // https://en.wikipedia.org/wiki/Levenshtein_distance
+//
+// https://people.cs.pitt.edu/~kirk/cs1501/Pruhs/Spring2006/assignments/editdistance/Levenshtein%20Distance.htm
 public class LevenshteinDistance {
 
   /**
@@ -21,55 +23,59 @@ public class LevenshteinDistance {
       return 0;
     }
 
+    int m = token1.length();
+    int n = token2.length();
+
     // corner-cases: for empty string distance would be the length of another string
-    if (token1.isEmpty()) {
-      return token2.length();
-    } else if (token2.isEmpty()) {
-      return token1.length();
+    if (m == 0) {
+      return n;
+    } else if (n == 0) {
+      return m;
     }
 
-    return levenshteinDistance(token1.toCharArray(), token1.length(), token2.toCharArray(), token2.length());
-  }
+    char[] s = token1.toCharArray();
+    char[] t = token2.toCharArray();
 
-  private static int levenshteinDistance(char[] s, final int m, char[] t, final int n) {
+    // https://bitbucket.org/clearer/iosifovitch/src/master/src/levenshtein.cpp
 
-    // for all i and j, d[i,j] will hold the Levenshtein distance between
-    // the first i characters of s and the first j characters of t
-    int d[][] = new int[m + 1][n + 1];
+    // create two work vectors of integer distances
+    int[] v0 = new int[n + 1];
+    int[] v1 = new int[n + 1];
 
-    // set each element in d to zero
-    for (int i = 0; i <= m; i++) {
-      for (int j = 0; j <= n; j++) {
-        d[i][j] = 0;
+    // initialize v0 (the previous row of distances)
+    // this row is A[0][i]: edit distance for an empty s
+    // the distance is just the number of characters to delete from t
+    for (int i = 0; i < n + 1; i++) {
+      v0[i] = i;
+    }
+
+    // calculate v1 (current row distances) from the previous row v0
+    for (int i = 1; i < m; i++) {
+
+      // first element of v1 is A[i+1][0]
+      // edit distance is delete (i+1) chars from s to match empty t
+      v1[0] = i + 1;
+
+      // use formula to fill in the rest of the row
+      for (int j = 1; j < n; j++) {
+
+        // calculating costs for A[i+1][j+1]
+        int deletionCost = v0[j + 1] + 1;
+        int insertionCost = v0[j] + 1;
+        int substitutionCost = v0[j];
+        if (s[i] != t[j]) {
+          substitutionCost++;
+        }
+
+        v1[j] = minimum(deletionCost, insertionCost, substitutionCost);
       }
+
+      // copy v1 (current row) to v0 (previous row) for next iteration
+      // since data in v1 is always invalidated, a swap without copy could be more efficient
+      System.arraycopy(v1, 0, v0, 0, n + 1);
     }
 
-    // source prefixes can be transformed into empty string by dropping all characters
-    for (int i = 1; i <= m; i++) {
-      d[i][0] = i;
-    }
-
-    // target prefixes can be reached from empty source prefix by inserting every character
-    for (int j = 1; j <= n; j++) {
-      d[0][j] = j;
-    }
-
-    for (int j = 1; j <= n; j++) {
-      for (int i = 1; i <= m; i++) {
-
-        int substitutionCost = s[i - 1] != t[j - 1] ? 1 : 0;
-
-        d[i][j] = minimum(
-            d[i - 1][j] + 1,                    // deletion
-            d[i][j - 1] + 1,                      // insertion
-            d[i - 1][j - 1] + substitutionCost  // substitution
-        );
-      }
-    }
-
-    // displayMatrix(d, m + 1, n + 1);
-
-    return d[m][n];
+    return v0[n];
   }
 
   private static int minimum(int a, int b, int c) {
