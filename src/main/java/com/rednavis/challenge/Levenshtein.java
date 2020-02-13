@@ -8,8 +8,7 @@ package com.rednavis.challenge;
 public class Levenshtein {
 
   /**
-   * The Levenshtein distance algorithm w/o allocating the full matrix, but an optimized version, which allocates only one column at a
-   * time.
+   * The Levenshtein distance algorithm w/o allocating the full matrix, but an optimized version, which allocates only one column at a time.
    *
    * @param token1 first string
    * @param token2 second string
@@ -27,28 +26,28 @@ public class Levenshtein {
   }
 
   // implemented based on https://en.wikipedia.org/wiki/Levenshtein_distance#Recursive
-  private static int levenshteinDistance(char[] s, int len_s, char[] t, int len_t) {
+  private static int levenshteinDistance(char[] first, int firstLength, char[] second, int secondLength) {
 
     int cost = 0;
 
-    /* base case: empty strings */
-    if (len_s == 0) {
-      return len_t;
+    // base case: empty strings
+    if (firstLength == 0) {
+      return secondLength;
     }
-    if (len_t == 0) {
-      return len_s;
+    if (secondLength == 0) {
+      return firstLength;
     }
 
-    /* test if last characters of the strings match */
-    if (s[len_s - 1] != t[len_t - 1]) {
+    // test if last characters of the strings match
+    if (first[firstLength - 1] != second[secondLength - 1]) {
       cost = 1;
     }
 
-    /* return minimum of delete char from s, delete char from t, and delete char from both */
+    // return minimum of delete char from s, delete char from t, and delete char from both
     return minimum(
-        levenshteinDistance(s, len_s - 1, t, len_t) + 1,
-        levenshteinDistance(s, len_s, t, len_t - 1) + 1,
-        levenshteinDistance(s, len_s - 1, t, len_t - 1) + cost
+        levenshteinDistance(first, firstLength - 1, second, secondLength) + 1,
+        levenshteinDistance(first, firstLength, second, secondLength - 1) + 1,
+        levenshteinDistance(first, firstLength - 1, second, secondLength - 1) + cost
     );
   }
 
