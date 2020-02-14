@@ -15,6 +15,12 @@ public class LevenshteinDistanceTest {
     assertThat(LevenshteinDistance.levenshtein("", "Maus")).isEqualTo(4);
     assertThat(LevenshteinDistance.levenshtein("", "")).isEqualTo(0);
     assertThat(LevenshteinDistance.levenshtein("Maus", "Maus")).isEqualTo(0);
+    assertThat(LevenshteinDistance.levenshtein("a", "b")).isEqualTo(1);
+
+    // test case from Wikipedia
+    assertThat(LevenshteinDistance.levenshtein("kitten", "sitting")).isEqualTo(3);
+    assertThat(LevenshteinDistance.levenshtein("sitting", "kitten")).isEqualTo(3);
+    assertThat(LevenshteinDistance.levenshtein("kitten", "kitten")).isEqualTo(0);
   }
 
   @Test
@@ -26,7 +32,11 @@ public class LevenshteinDistanceTest {
   }
 
   @Test
-  public void kittenSittingTest() {
-    assertThat(LevenshteinDistance.levenshtein("sitting", "kitten")).isEqualTo(3);
+  public void shouldMakeEarlyExitWhenExceedMaximumAllowedDistance() {
+    assertThat(LevenshteinDistance.levenshtein("Haus1", "Maus2", 0)).isEqualTo(1);
+    assertThat(LevenshteinDistance.levenshtein("Haus", "Maus", 2)).isEqualTo(1);
+    assertThat(LevenshteinDistance.levenshtein("Haus", "Mausi", 2)).isEqualTo(2);
+    assertThat(LevenshteinDistance.levenshtein("Haus", "Häuser", 2)).isEqualTo(3);
+    assertThat(LevenshteinDistance.levenshtein("Kartoffelsalat", "Runkelrüben", 2)).isEqualTo(3);
   }
 }
