@@ -21,16 +21,26 @@ public class LevenshteinDistance {
     return levenshtein(token1, token2, -1);
   }
 
+  public static int levenshtein(String token1, String token2, int maxDist) {
+    return levenshtein(token1, token2, maxDist, Algorithm.ADAPTIVE);
+  }
+
+  public static int levenshtein(String token1, String token2, Algorithm algorithm) {
+    return levenshtein(token1, token2, -1, algorithm);
+  }
+
   /**
-   * The Levenshtein distance algorithm w/o allocating the full matrix, but an optimized version, which allocates only one column at a time. which
-   * makes an early exit if the distance exceeds a maximum distance #maxDist.
+   * <p>The Levenshtein distance algorithm w/o allocating the full matrix, but an optimized version, which allocates only one column at a time. which
+   * makes an early exit if the distance exceeds a maximum distance #maxDist.</p>
+   * <p>Allows to specify implementation details for performance measurement.</p>
    *
-   * @param token1  first string
-   * @param token2  second string
-   * @param maxDist maximum allowed distance (early exit trigger condition)
+   * @param token1    first string
+   * @param token2    second string
+   * @param maxDist   maximum allowed distance (early exit trigger condition)
+   * @param algorithm specify implementation details
    * @return Levenshtein (edit) distance
    */
-  public static int levenshtein(String token1, String token2, int maxDist) {
+  public static int levenshtein(String token1, String token2, int maxDist, Algorithm algorithm) {
 
     // it is zero if and only if the strings are equal
     if (token1.equals(token2)) {
@@ -58,6 +68,20 @@ public class LevenshteinDistance {
     } else if (n == 0) {
       return m;
     }
+
+    switch (algorithm) {
+      case RECURSIVE:
+        return recursive(s, m, t, n);
+      case ADAPTIVE:
+        return adaptive(s, t, m, n, maxDist);
+      case FULL_MATRIX:
+        return fullMatrix(s, m, t, n);
+      default:
+        throw new IllegalStateException("Unexpected value: " + algorithm);
+    }
+  }
+
+  private static int adaptive(char[] s, char[] t, int m, int n, int maxDist) {
 
     // create buffer array of integer distances
     int length = n + 1;
@@ -99,5 +123,80 @@ public class LevenshteinDistance {
     } else {
       return buffer[length - 1];
     }
+  }
+
+  private static int fullMatrix(char[] s, final int m, char[] t, final int n) {
+
+    // for all i and j, d[i,j] will hold the Levenshtein distance between
+    // the first i characters of s and the first j characters of t
+    int d[][] = new int[m + 1][n + 1];
+
+    // set each element in d to zero
+    for (int i = 0; i <= m; i++) {
+      for (int j = 0; j <= n; j++) {
+        d[i][j] = 0;
+      }
+    }
+
+    // source prefixes can be transformed into empty string by dropping all characters
+    for (int i = 1; i <= m; i++) {
+      d[i][0] = i;
+    }
+
+    // target prefixes can be reached from empty source prefix by inserting every character
+    for (int j = 1; j <= n; j++) {
+      d[0][j] = j;
+    }
+
+    for (int j = 1; j <= n; j++) {
+      for (int i = 1; i <= m; i++) {
+
+        int substitutionCost = s[i - 1] != t[j - 1] ? 1 : 0;
+
+        d[i][j] = minimum(
+            d[i - 1][j] + 1,                    // deletion
+            d[i][j - 1] + 1,                      // insertion
+            d[i - 1][j - 1] + substitutionCost  // substitution
+        );
+      }
+    }
+
+    return d[m][n];
+  }
+
+  // based on pseudocode from https://en.wikipedia.org/wiki/Levenshtein_distance#Recursive
+  private static int recursive(char[] s, int m, char[] t, int n) {
+
+    int cost = 0;
+
+    /* base case: empty strings */
+    if (m == 0) {
+      return n;
+    }
+    if (n == 0) {
+      return m;
+    }
+
+    // test if last characters of the strings match
+    if (s[m - 1] == t[n - 1]) {
+      cost = 0;
+    } else {
+      cost = 1;
+    }
+
+    // return minimum of delete char from s, delete char from t, and delete char from both
+    return minimum(
+        recursive(s, m - 1, t, n) + 1,
+        recursive(s, m, t, n - 1) + 1,
+        recursive(s, m - 1, t, n - 1) + cost
+    );
+  }
+
+  private static int minimum(int a, int b, int c) {
+    return Math.min(Math.min(a, b), c);
+  }
+
+  public enum Algorithm {
+    RECURSIVE, FULL_MATRIX, ADAPTIVE
   }
 }

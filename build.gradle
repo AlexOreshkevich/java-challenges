@@ -21,12 +21,10 @@ repositories {
 }
 
 dependencies {
+
+    // testing
     implementation 'junit:junit:4.13'
     testCompile("org.assertj:assertj-core:3.11.1")
-}
-
-tasks.withType(Test).configureEach {
-    outputs.upToDateWhen { false }
 }
 
 jacocoTestReport {
@@ -34,4 +32,14 @@ jacocoTestReport {
         xml.enabled true
         html.enabled false
     }
+}
+
+test {
+    useJUnit()
+
+    maxParallelForks = 4
+    forkEvery = 1
+    maxHeapSize = "512Mb"
+
+    outputs.upToDateWhen { false }
 }

@@ -3,12 +3,17 @@ package com.rednavis.challenge;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+import com.rednavis.challenge.LevenshteinDistance.Algorithm;
+import java.util.UUID;
 import org.junit.Test;
 
-// https://mkyong.com/java/java-jmh-benchmark-tutorial/
-// http://tutorials.jenkov.com/java-performance/jmh.html
-// JMH Benchmark Modes
+/**
+ * Performance measurements provided by gradle build system automatically, it could be taken from test execution time.
+ */
 public class LevenshteinDistanceTest {
+
+  static final String randomFirst = UUID.randomUUID().toString().substring(0, 7);
+  static final String randomSecond = UUID.randomUUID().toString().substring(0, 7);
 
   @Test
   public void shouldPassCornerCases() {
@@ -16,27 +21,44 @@ public class LevenshteinDistanceTest {
     assertThat(LevenshteinDistance.levenshtein("", "")).isEqualTo(0);
     assertThat(LevenshteinDistance.levenshtein("Maus", "Maus")).isEqualTo(0);
     assertThat(LevenshteinDistance.levenshtein("a", "b")).isEqualTo(1);
-
-    // test case from Wikipedia
-    assertThat(LevenshteinDistance.levenshtein("kitten", "sitting")).isEqualTo(3);
-    assertThat(LevenshteinDistance.levenshtein("sitting", "kitten")).isEqualTo(3);
-    assertThat(LevenshteinDistance.levenshtein("kitten", "kitten")).isEqualTo(0);
   }
 
-  @Test
-  public void shouldPassMasterTestCase() {
-    assertThat(LevenshteinDistance.levenshtein("Haus", "Maus")).isEqualTo(1);
-    assertThat(LevenshteinDistance.levenshtein("Haus", "Mausi")).isEqualTo(2);
-    assertThat(LevenshteinDistance.levenshtein("Haus", "Häuser")).isEqualTo(3);
-    assertThat(LevenshteinDistance.levenshtein("Kartoffelsalat", "Runkelrüben")).isEqualTo(12);
+  private static void masterTestCase(Algorithm algorithm) {
+
+    assertThat(LevenshteinDistance.levenshtein("Haus", "Maus", algorithm)).isEqualTo(1);
+    assertThat(LevenshteinDistance.levenshtein("Haus", "Mausi", algorithm)).isEqualTo(2);
+    assertThat(LevenshteinDistance.levenshtein("Haus", "Häuser", algorithm)).isEqualTo(3);
+    assertThat(LevenshteinDistance.levenshtein("Kartoffelsalat", "Runkelrüben", algorithm)).isEqualTo(12);
+
+    assertThat(LevenshteinDistance.levenshtein(randomFirst, randomSecond, algorithm))
+        .isLessThanOrEqualTo(Math.max(randomFirst.length(), randomSecond.length()));
   }
 
-  @Test
-  public void shouldMakeEarlyExitWhenExceedMaximumAllowedDistance() {
-    assertThat(LevenshteinDistance.levenshtein("Haus1", "Maus2", 0)).isEqualTo(1);
-    assertThat(LevenshteinDistance.levenshtein("Haus", "Maus", 2)).isEqualTo(1);
-    assertThat(LevenshteinDistance.levenshtein("Haus", "Mausi", 2)).isEqualTo(2);
-    assertThat(LevenshteinDistance.levenshtein("Haus", "Häuser", 2)).isEqualTo(3);
-    assertThat(LevenshteinDistance.levenshtein("Kartoffelsalat", "Runkelrüben", 2)).isEqualTo(3);
+  private static void masterTestCaseWithMaxDistance(Algorithm algorithm) {
+    assertThat(LevenshteinDistance.levenshtein("Haus1", "Maus2", 0, algorithm)).isEqualTo(1);
+    assertThat(LevenshteinDistance.levenshtein("Haus", "Maus", 2, algorithm)).isEqualTo(1);
+    assertThat(LevenshteinDistance.levenshtein("Haus", "Mausi", 2, algorithm)).isEqualTo(2);
+    assertThat(LevenshteinDistance.levenshtein("Haus", "Häuser", 2, algorithm)).isEqualTo(3);
+    assertThat(LevenshteinDistance.levenshtein("Kartoffelsalat", "Runkelrüben", 2, algorithm)).isEqualTo(3);
+  }
+
+  @Test(timeout = 10000L)
+  public void recursive() {
+    masterTestCase(Algorithm.RECURSIVE);
+  }
+
+  @Test(timeout = 10000L)
+  public void fullMatrix() {
+    masterTestCase(Algorithm.FULL_MATRIX);
+  }
+
+  @Test(timeout = 10000L)
+  public void adaptive() {
+    masterTestCase(Algorithm.ADAPTIVE);
+  }
+
+  @Test(timeout = 10000L)
+  public void adaptiveWithMaxDistance() {
+    masterTestCaseWithMaxDistance(Algorithm.ADAPTIVE);
   }
 }
