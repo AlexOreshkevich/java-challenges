@@ -11,8 +11,8 @@ import org.junit.Test;
  */
 public class LevenshteinDistanceTest {
 
-  static final String randomFirst = UUID.randomUUID().toString().substring(0, 7);
-  static final String randomSecond = UUID.randomUUID().toString().substring(0, 7);
+  static final String firstRandom = UUID.randomUUID().toString().substring(0, 7);
+  static final String secondRandom = UUID.randomUUID().toString().substring(0, 7);
 
   @Test
   public void shouldPassCornerCases() {
@@ -29,8 +29,8 @@ public class LevenshteinDistanceTest {
     assertThat(LevenshteinDistance.levenshtein("Haus", "Häuser", algorithm)).isEqualTo(3);
     assertThat(LevenshteinDistance.levenshtein("Kartoffelsalat", "Runkelrüben", algorithm)).isEqualTo(12);
 
-    assertThat(LevenshteinDistance.levenshtein(randomFirst, randomSecond, algorithm))
-        .isLessThanOrEqualTo(Math.max(randomFirst.length(), randomSecond.length()));
+    assertThat(LevenshteinDistance.levenshtein(firstRandom, secondRandom, algorithm))
+        .isLessThanOrEqualTo(Math.max(firstRandom.length(), secondRandom.length()));
   }
 
   private static void masterTestCaseWithMaxDistance(Algorithm algorithm) {
