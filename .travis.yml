@@ -30,5 +30,5 @@ cache:
     - $HOME/.gradle/wrapper/
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
   - java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r build/reports/jacoco/test/jacocoTestReport.xml
+  - bash <(curl -s https://codecov.io/bash)
