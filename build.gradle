@@ -32,12 +32,10 @@ jacocoTestReport {
 }
 
 test {
-    useJUnit()
-
     maxParallelForks = 4
     forkEvery = 1
-    maxHeapSize = "512Mb"
-
+    maxHeapSize = "512m"
+    failFast = false
     outputs.upToDateWhen { false }
 }
 
