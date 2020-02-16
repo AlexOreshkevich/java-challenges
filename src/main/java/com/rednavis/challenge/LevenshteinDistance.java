@@ -34,33 +34,33 @@ public class LevenshteinDistance {
    * makes an early exit if the distance exceeds a maximum distance #maxDist.</p>
    * <p>Allows to specify implementation details for performance measurement.</p>
    *
-   * @param token1    first string
-   * @param token2    second string
-   * @param maxDist   maximum allowed distance (early exit trigger condition)
-   * @param algorithm specify implementation details
+   * @param first       first string
+   * @param second      second string
+   * @param maxDistance maximum allowed distance (early exit trigger condition)
+   * @param algorithm   specify implementation details
    * @return Levenshtein (edit) distance
    */
-  public static int levenshtein(String token1, String token2, int maxDist, Algorithm algorithm) {
+  public static int levenshtein(String first, String second, int maxDistance, Algorithm algorithm) {
 
     // it is zero if and only if the strings are equal
-    if (token1.equals(token2)) {
+    if (first.equals(second)) {
       return 0;
     }
 
-    char[] s;
-    char[] t;
+    char[] firstChars;
+    char[] secondChars;
 
-    // re-reference s and t to token1 and token2 respectively if first string is longer than second one
-    if (token1.length() > token2.length()) {
-      s = token2.toCharArray();
-      t = token1.toCharArray();
+    // re-reference first and second if first string is longer than second one
+    if (first.length() > second.length()) {
+      firstChars = second.toCharArray();
+      secondChars = first.toCharArray();
     } else {
-      s = token1.toCharArray();
-      t = token2.toCharArray();
+      firstChars = first.toCharArray();
+      secondChars = second.toCharArray();
     }
 
-    int m = s.length;
-    int n = t.length;
+    int m = firstChars.length;
+    int n = secondChars.length;
 
     // corner-cases: for empty string distance would be the length of another string
     if (m == 0) {
@@ -71,11 +71,11 @@ public class LevenshteinDistance {
 
     switch (algorithm) {
       case RECURSIVE:
-        return recursive(s, m, t, n);
+        return recursive(firstChars, secondChars, m, n);
       case ADAPTIVE:
-        return adaptive(s, t, m, n, maxDist);
+        return adaptive(firstChars, secondChars, m, n, maxDistance);
       case FULL_MATRIX:
-        return fullMatrix(s, m, t, n);
+        return fullMatrix(firstChars, secondChars, m, n);
       default:
         throw new IllegalStateException("Unexpected value: " + algorithm);
     }
@@ -125,11 +125,11 @@ public class LevenshteinDistance {
     }
   }
 
-  private static int fullMatrix(char[] s, final int m, char[] t, final int n) {
+  private static int fullMatrix(char[] s, char[] t, final int m, final int n) {
 
     // for all i and j, d[i,j] will hold the Levenshtein distance between
     // the first i characters of s and the first j characters of t
-    int d[][] = new int[m + 1][n + 1];
+    int[][] d = new int[m + 1][n + 1];
 
     // set each element in d to zero
     for (int i = 0; i <= m; i++) {
@@ -165,7 +165,7 @@ public class LevenshteinDistance {
   }
 
   // based on pseudocode from https://en.wikipedia.org/wiki/Levenshtein_distance#Recursive
-  private static int recursive(char[] s, int m, char[] t, int n) {
+  private static int recursive(char[] s, char[] t, int m, int n) {
 
     int cost = 0;
 
@@ -186,9 +186,9 @@ public class LevenshteinDistance {
 
     // return minimum of delete char from s, delete char from t, and delete char from both
     return minimum(
-        recursive(s, m - 1, t, n) + 1,
-        recursive(s, m, t, n - 1) + 1,
-        recursive(s, m - 1, t, n - 1) + cost
+        recursive(s, t, m - 1, n) + 1,
+        recursive(s, t, m, n - 1) + 1,
+        recursive(s, t, m - 1, n - 1) + cost
     );
   }
 

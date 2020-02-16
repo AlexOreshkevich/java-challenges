@@ -2,7 +2,6 @@ package com.rednavis.challenge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 import com.rednavis.challenge.LevenshteinDistance.Algorithm;
 import java.util.UUID;
 import org.junit.Test;

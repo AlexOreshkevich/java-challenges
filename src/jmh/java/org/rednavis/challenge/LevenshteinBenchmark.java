@@ -16,7 +16,7 @@ public class LevenshteinBenchmark {
   @BenchmarkMode(Mode.AverageTime)
   public void recursive(TestSuite testSuite) {
     for (TestCase testCase : testSuite.testCases) {
-      LevenshteinDistance.levenshtein(testCase.s, testCase.t, Algorithm.RECURSIVE);
+      LevenshteinDistance.levenshtein(testCase.first, testCase.second, Algorithm.RECURSIVE);
     }
   }
 
@@ -24,7 +24,7 @@ public class LevenshteinBenchmark {
   @BenchmarkMode(Mode.AverageTime)
   public void fullMatrix(TestSuite testSuite) {
     for (TestCase testCase : testSuite.testCases) {
-      LevenshteinDistance.levenshtein(testCase.s, testCase.t, Algorithm.FULL_MATRIX);
+      LevenshteinDistance.levenshtein(testCase.first, testCase.second, Algorithm.FULL_MATRIX);
     }
   }
 
@@ -32,7 +32,7 @@ public class LevenshteinBenchmark {
   @BenchmarkMode(Mode.AverageTime)
   public void adaptive(TestSuite testSuite) {
     for (TestCase testCase : testSuite.testCases) {
-      LevenshteinDistance.levenshtein(testCase.s, testCase.t, Algorithm.ADAPTIVE);
+      LevenshteinDistance.levenshtein(testCase.first, testCase.second, Algorithm.ADAPTIVE);
     }
   }
 
@@ -40,20 +40,20 @@ public class LevenshteinBenchmark {
   @BenchmarkMode(Mode.AverageTime)
   public void adaptiveWithMaxDistance(TestSuite testSuite) {
     for (TestCase testCase : testSuite.testCases) {
-      LevenshteinDistance.levenshtein(testCase.s, testCase.t, testCase.maxDistance, Algorithm.ADAPTIVE);
+      LevenshteinDistance.levenshtein(testCase.first, testCase.second, testCase.maxDistance, Algorithm.ADAPTIVE);
     }
   }
 
   static class TestCase {
 
-    String s;
-    String t;
+    String first;
+    String second;
     int distance;
     int maxDistance;
 
-    public TestCase(String s, String t, int distance, int maxDistance) {
-      this.s = s;
-      this.t = t;
+    public TestCase(String first, String second, int distance, int maxDistance) {
+      this.first = first;
+      this.second = second;
       this.distance = distance;
       this.maxDistance = maxDistance;
     }
